@@ -14,7 +14,7 @@ Loon、Surge:
 [Script]
 cron "6 9 * * *" script-path=https://raw.githubusercontent.com/Yuheng0101/X/main/Tasks/moyu.js, timeout=10, tag=摸鱼, argument="https://is1-ssl.mzstatic.com/image/thumb/Purple126/v4/67/04/ff/6704ff4c-b49b-de91-70ac-201c62d5296f/AppIcon-0-0-1x_U007emarketing-0-0-0-5-0-0-sRGB-0-0-0-GLES2_U002c0-512MB-85-220-0-0.png/144x144bb.png"
 ******************************************/
-const scriptName = '摸鱼来啦~';
+const scriptName = '新的一天来啦~';
 const $ = new Env(scriptName);
 let calendar = {};
 loadCalendar();
@@ -25,7 +25,6 @@ const month = today.getMonth() + 1;
 const day = today.getDate();
 const hour = today.getHours();
 const festivalList = [
-    { festival: '阿宏生日', date: lunar2solar(year, 12, 21) },
     { festival: '元宵节', date: lunar2solar(year, 1, 15) },
     { festival: '清明', date: getQinMingJieDate() },
     { festival: '劳动节', date: `${year}/5/1` },
@@ -34,6 +33,7 @@ const festivalList = [
     { festival: '国庆节', date: `${year}/10/1` },
 	{ festival: '考研', date: `${year}/12/23` },
     { festival: '元旦', date: `${year + 1}/1/1` },
+	{ festival: '阿宏生日', date: lunar2solar(year, 12, 21) },
     { festival: '春节', date: lunar2solar(year + 1, 1, 1) },
 ];
 let holidayList = [];
