@@ -31,9 +31,9 @@ const festivalList = [
     { festival: '端午节', date: lunar2solar(year, 5, 5) },
     { festival: '中秋节', date: lunar2solar(year, 8, 15) },
     { festival: '国庆节', date: `${year}/10/1` },
-	{ festival: '考研', date: `${year}/12/23` },
+    { festival: '考研', date: `${year}/12/23` },
     { festival: '元旦', date: `${year + 1}/1/1` },
-	{ festival: '阿宏生日', date: lunar2solar(year, 12, 21) },
+    { festival: '阿宏生日', date: lunar2solar(year, 12, 21) },
     { festival: '春节', date: lunar2solar(year + 1, 1, 1) },
 ];
 let holidayList = [];
@@ -76,7 +76,7 @@ function toNotify() {
         }
         let content = `【${month}月${day}日${timeFrame}】`
         content += "\n生活不止眼前的苟且，还有诗和远方，愿你今日安好。";
-		content += '\n【节日预警】'
+	content += '\n【节日预警】'
         if (holidayList.length > 0) {
             holidayList.map(item => {
                 content += `\n距离${item.festival}还有${item.diff}天`
