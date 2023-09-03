@@ -76,6 +76,12 @@ function toNotify() {
         }
         let content = `【${month}月${day}日${timeFrame}】`
         content += "\n生活不止眼前的苟且，还有诗和远方，愿你今日安好。";
+		content += '\n【节日预警】'
+        if (holidayList.length > 0) {
+            holidayList.map(item => {
+                content += `\n距离${item.festival}还有${item.diff}天`
+            })
+        }
         const _almanac = await getPermanentCalendar();
         if (_almanac) {
             content += '\n【今日黄历】'
@@ -85,19 +91,7 @@ function toNotify() {
             content += "\n[宜]" + _almanac["suit"].map(item => item?.desc ? `${item.name(item.desc)}` : `${item.name}`).join(" ")
             content += "\n[忌]" + _almanac["avoid"].map(item => item?.desc ? `${item.name(item.desc)}` : `${item.name}`).join(" ")
         }
-        const weeekend = getRemainDays(getWeekend());
-        content += '\n【快乐周末】'
-        if (weeekend > 0 && weeekend < 6) {
-            content += `\n距离周末还有${weeekend}天`
-        } else {
-            content += `\n今天就是周末呀，快去摸鱼吧~`
-        }
-        content += '\n【节日预警】'
-        if (holidayList.length > 0) {
-            holidayList.map(item => {
-                content += `\n距离${item.festival}还有${item.diff}天`
-            })
-        }
+
         // @薛定谔的大灰机
         const notifyImgs = [
             "https://s2.loli.net/2022/02/24/SG5svAxd1eXwVDK.jpg",
