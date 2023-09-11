@@ -1,0 +1,86 @@
+#include "xil_printf.h"
+#include "stdio.h"
+#include "pl_bram_rd.h"
+#include "xbram.h"
+#include "crc.h"
+
+#define PL_BRAM_BASE XPAR_PL_BRAM_RD_0_S00_AXI_BASEADDR //PL_RAM_RD 基地址
+#define PL_BRAM_START PL_BRAM_RD_S00_AXI_SLV_REG0_OFFSET //RAM 读开始寄存器地址
+#define PL_BRAM_START_ADDR PL_BRAM_RD_S00_AXI_SLV_REG1_OFFSET //RAM 起始寄存器地址
+#define PL_BRAM_LEN PL_BRAM_RD_S00_AXI_SLV_REG2_OFFSET //PL 读 RAM 的深度
+
+#define START_ADDR 0 //RAM 起始地址 范围:0~1023
+#define BRAM_DATA_BYTE 4 //BRAM 数据字节个数
+
+u32 ch_data[1024]; //写入 BRAM 的字符数组
+int ch_data_len; //写入 BRAM 的字符长度
+
+//函数声明
+void str_wr_bram();
+void str_rd_bram(u32*);
+
+int main()
+{
+//while(1){//加while(1)用以确保程序持续运行,添加交互时使用
+	u32 out[1024];
+	int flag=0;
+	//交互
+	/*
+	printf("Please enter data to read and write BRAM\n") ;
+	scanf("%s", ch_data); //用户输入字符串(此处由于类型不匹配，数据会有一定变化)
+	*/
+	//预设数据
+	ch_data[0]=1234;
+	ch_data[1]=1111;//输入数据，也可改变此处代码，循环输入数据
+
+	ch_data_len = sizeof(ch_data); //计算字符串的长度
+
+
+	ch_data[1023]=0;
+	ch_data[1023]=ch_data[1023]|crc_tx((unsigned char*)ch_data,ch_data_len-2)<<16;//将CRC结果序列存最后一个32位数据中
+
+	ch_data[0]^=0x0001;	//引入错误		如不引入错误：0x0000
+
+	str_wr_bram(); //将用户输入的字符串写入 BRAM
+	str_rd_bram(out); //从 BRAM 中读出数据
+//CRC校验
+	flag=crc_rev((unsigned char*)out,ch_data_len);
+	if(!flag){printf("传输正确\n");}
+	else printf("传输错误\n重新输入\n");
+//	}
+
+}
+//将字符串写入 BRAM
+void str_wr_bram()
+ 	 {
+	int i=0,wr_cnt = 0;
+//每次循环向 BRAM 中写入 1 个字符
+	for(i = BRAM_DATA_BYTE*START_ADDR ; i < BRAM_DATA_BYTE*(START_ADDR + ch_data_len) ;
+	i += BRAM_DATA_BYTE){
+
+			XBram_WriteReg(XPAR_BRAM_0_BASEADDR,i,ch_data[wr_cnt]) ;
+			wr_cnt++;
+						}
+//设置 BRAM 写入的字符串长度
+PL_BRAM_RD_mWriteReg(PL_BRAM_BASE, PL_BRAM_LEN , BRAM_DATA_BYTE*ch_data_len) ;
+//设置 BRAM 的起始地址
+PL_BRAM_RD_mWriteReg(PL_BRAM_BASE, PL_BRAM_START_ADDR, BRAM_DATA_BYTE*START_ADDR) ;
+//拉高 BRAM 开始信号
+PL_BRAM_RD_mWriteReg(PL_BRAM_BASE, PL_BRAM_START , 1) ;
+//拉低 BRAM 开始信号
+PL_BRAM_RD_mWriteReg(PL_BRAM_BASE, PL_BRAM_START , 0) ;
+ }
+//从 BRAM 中读出数据
+void str_rd_bram(u32* r_data)
+{
+	u32 read_data=0,i=0;
+	int j=0;
+
+//循环从 BRAM 中读出数据
+	for(i = BRAM_DATA_BYTE*START_ADDR ,j=0; i < BRAM_DATA_BYTE*(START_ADDR + ch_data_len) ;
+			i += BRAM_DATA_BYTE,j++)
+	{
+		read_data = XBram_ReadReg(XPAR_BRAM_0_BASEADDR,i) ;
+		r_data[j]=read_data;
+	}
+}
