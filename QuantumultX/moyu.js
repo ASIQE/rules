@@ -22,7 +22,7 @@ const request = $.http;
 const today = new Date();
 const year = today.getFullYear();
 const month = today.getMonth() + 1;
-const day = today.getDate();
+const day = today.getDate() - 1;
 const hour = today.getHours();
 const festivalList = [
     { festival: '元宵节', date: lunar2solar(year, 1, 15) },
